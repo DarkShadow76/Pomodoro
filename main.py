@@ -1,6 +1,7 @@
 from tkinter import *
-##import colorgram
 import math
+from pydub import AudioSegment
+from pydub.playback import play
 
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
@@ -10,9 +11,18 @@ YELLOW = "#f7f5dd"
 FONT_NAME = "Arial"
 WORK_MIN = 25
 SHORT_BREAK_MIN = 5
-LONG_BREAK_MIN = 20
+LONG_BREAK_MIN = 15
 reps = 0
 timer = None
+
+# ---------------------------- SOUND SETUP ------------------------------- #
+ALARM_SOUND = None
+
+try:
+    ALARM_SOUND = AudioSegment.from_wav("Hey_listen.wav")
+except Exception as e:
+    print("Error loading sound file:", e)
+
 # ---------------------------- TIMER RESET ------------------------------- #
 
 
@@ -67,8 +77,11 @@ def count_down(count):
         work_session = math.floor(reps / 2)
         for _ in range(work_session):
             marks += ""
-        check_marks.config(text="marks")
+        check_marks.config(text=marks)
 
+        if ALARM_SOUND:
+            play(ALARM_SOUND)
+        else: window.bell()
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -87,7 +100,7 @@ window.after(
 
 window.resizable(False, False)
 
-title_label = Label(text="Timer", fg=GREEN, bg=YELLOW, font=(FONT_NAME, 100))
+title_label = Label(text="Timer", fg=GREEN, bg=YELLOW, font=(FONT_NAME, 35, "bold"))
 title_label.grid(column=1, row=0)
 
 ##title_label.pack(pady=50)
@@ -121,6 +134,7 @@ reset_button.grid(column=2, row=2)
 check_marks = Label(fg=GREEN, bg=YELLOW)
 check_marks.grid(column=1, row=3)
 
-count_down(0)
+#count_down(0)
+start_timer()
 
 window.mainloop()
