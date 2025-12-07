@@ -8,10 +8,10 @@ PINK = "#e2979c"
 RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
-FONT_NAME = "Arial"
-WORK_MIN = 25
-SHORT_BREAK_MIN = 5
-LONG_BREAK_MIN = 15
+FONT_NAME = "fixed"
+WORK_MIN = 0.5
+SHORT_BREAK_MIN = 0.3
+LONG_BREAK_MIN = 0.2
 reps = 0
 timer = None
 
@@ -22,6 +22,13 @@ try:
     ALARM_SOUND = AudioSegment.from_wav("Hey_listen.wav")
 except Exception as e:
     print("Error loading sound file:", e)
+
+# ---------------------------- SOUND PLAYER ------------------------------- #
+def play_alarm():
+    if ALARM_SOUND:
+        play(ALARM_SOUND)
+    else: 
+        window.bell()
 
 # ---------------------------- TIMER RESET ------------------------------- #
 
@@ -48,10 +55,12 @@ def start_timer():
 
     if reps % 8 == 0:
         count_down(long_break_sec)
-        title_label.config(text="Break", fg=RED)
+        title_label.config(text="Long Break", fg=RED)
+        check_marks.config(text=f"Session: {reps}/8")
     elif reps % 2 == 0:
         count_down(short_break_sec)
         title_label.config(text="Break", fg=PINK)
+        check_marks.config(text=f"Session: {reps}/2")
     else:
         count_down(work_sec)
         title_label.config(text="Work", fg=GREEN)
@@ -76,12 +85,10 @@ def count_down(count):
         marks = ""
         work_session = math.floor(reps / 2)
         for _ in range(work_session):
-            marks += ""
+            marks += "✔"
         check_marks.config(text=marks)
 
-        if ALARM_SOUND:
-            play(ALARM_SOUND)
-        else: window.bell()
+        play_alarm()
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -105,10 +112,12 @@ title_label.grid(column=1, row=0)
 
 ##title_label.pack(pady=50)
 
+tomato_img = PhotoImage(file="tomato.png")
+
 fg = GREEN
 
 canvas = Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
-tomato_img = PhotoImage(file="tomato.png")
+
 canvas.create_image(100, 112, image=tomato_img)
 timer_text = canvas.create_text(
     100, 130, text="00:00", fill="white", font=(FONT_NAME, 35, "bold")
@@ -131,10 +140,16 @@ reset_button = Button(
     )
 reset_button.grid(column=2, row=2)
 
-check_marks = Label(fg=GREEN, bg=YELLOW)
+check_marks = Label(fg=GREEN, bg=YELLOW,font=(FONT_NAME, 30))
 check_marks.grid(column=1, row=3)
 
 #count_down(0)
 start_timer()
+
+import tkinter.font as tkFont
+
+available_fonts = tkFont.families()
+print("--- Available Font Families ---")
+print(available_fonts)
 
 window.mainloop()
